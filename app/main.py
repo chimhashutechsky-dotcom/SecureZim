@@ -267,7 +267,15 @@ async def start_scan(
         db.commit()
         db.refresh(scan)
         
-        return scan
+        return ScanResponse(
+            id=scan.id,
+            asset_id=scan.asset_id,
+            target=asset.target,
+            status=scan.status,
+            security_score=scan.security_score,
+            started_at=scan.started_at,
+            finished_at=scan.finished_at,
+        )
     except Exception as exc:
         scan.status = "failed"
         scan.finished_at = datetime.utcnow()
@@ -309,7 +317,7 @@ def get_scan(
     scan = db.query(Scan).join(Asset).filter(
         Scan.id == scan_id,
         Asset.company_id == current_user.company_id,
-    ).first()
+    ).options(joinedload(Scan.asset)).first()
     
     if not scan:
         raise HTTPException(404, "Scan not found")
