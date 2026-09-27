@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="SecureZim defensive cybersecurity monitoring">
+  <title>SecureZim — Security monitoring</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+  <aside class="sidebar">
+    <a class="brand" href="#top"><span class="brand-mark">SZ</span><span>Secure<span class="accent">Zim</span></span></a>
+    <p class="eyebrow">Security operations</p>
+    <nav>
+      <a class="nav-link active" href="#overview"><span>⌂</span> Overview</a>
+      <a class="nav-link" href="#assets"><span>◈</span> Assets</a>
+      <a class="nav-link" href="#scans"><span>◌</span> Scan history</a>
+    </nav>
+    <div class="sidebar-note"><span class="status-dot"></span><div><strong>Monitoring active</strong><small>Only authorized assets</small></div></div>
+  </aside>
+
+  <main class="content" id="top">
+    <header class="topbar"><div><p class="eyebrow">Command center</p><h1>Good morning, stay secure.</h1></div><button class="primary" data-open-modal="asset-modal">+ Add asset</button></header>
+    <section class="hero" id="overview"><div><p class="eyebrow teal">DEFENSIVE MONITORING</p><h2>Know your exposure<br><em>before attackers do.</em></h2><p class="hero-copy">Monitor your authorized infrastructure, discover weaknesses, and turn findings into clear next steps.</p><button class="hero-button" data-open-modal="asset-modal">Protect an asset <span>→</span></button></div><div class="hero-orb"><div class="orb-ring ring-one"></div><div class="orb-ring ring-two"></div><div class="orb-core">◈</div><span class="orb-label label-one">LIVE</span><span class="orb-label label-two">AUTHORIZED</span></div></section>
+    <section class="stats" aria-label="Security summary"><article><span class="stat-icon blue">◆</span><div><small>Companies</small><strong id="companies-count">—</strong></div></article><article><span class="stat-icon purple">◈</span><div><small>Protected assets</small><strong id="assets-count">—</strong></div></article><article><span class="stat-icon orange">◌</span><div><small>Scans completed</small><strong id="scans-count">—</strong></div></article><article><span class="stat-icon red">!</span><div><small>Findings</small><strong id="findings-count">—</strong></div></article></section>
+    <div class="section-heading" id="assets"><div><p class="eyebrow">YOUR INVENTORY</p><h2>Protected assets</h2></div><button class="text-button" data-open-modal="asset-modal">Manage assets <span>→</span></button></div>
+    <section class="panel"><div class="panel-head"><strong>Authorized infrastructure</strong><span class="pill"><span class="status-dot"></span> Protected</span></div><div id="assets-list" class="asset-list"><div class="empty">Loading your protected assets…</div></div></section>
+    <div class="section-heading" id="scans"><div><p class="eyebrow">ACTIVITY</p><h2>Recent scans</h2></div><button class="text-button" id="refresh-button">Refresh <span>↻</span></button></div>
+    <section class="panel"><div class="scan-table-head"><span>Target</span><span>Status</span><span>Score</span><span>Date</span></div><div id="scans-list"><div class="empty">Loading scan history…</div></div></section>
+    <footer>SecureZim <span>•</span> Scan only systems you own or have explicit authorization to test.</footer>
+  </main>
+
+  <div class="modal-backdrop" id="asset-modal" hidden><div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title"><button class="close" data-close-modal>×</button><p class="eyebrow teal">NEW PROTECTION</p><h2 id="modal-title">Add an authorized asset</h2><p class="muted">Register an asset before starting a defensive scan.</p><form id="asset-form"><label>Company<select name="company_id" id="company-select" required></select></label><label>Domain, IP, or URL<input name="target" placeholder="example.com" required maxlength="255"></label><label class="check"><input type="checkbox" name="authorized" required> I confirm I own or am authorized to test this asset.</label><button class="primary full" type="submit">Add protected asset</button><p class="form-message" id="form-message"></p></form></div></div>
+  <div class="toast" id="toast" role="status"></div>
+  <script src="/static/app.js"></script>
+</body>
+</html>
