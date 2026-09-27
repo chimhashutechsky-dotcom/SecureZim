@@ -1,16 +1,22 @@
 import os
 from datetime import datetime, timedelta, timezone
 from typing import Optional
-import jwt
+from jwt import encode, decode, ExpiredSignatureError, JWTError
 from passlib.context import CryptContext
 from fastapi import Depends, HTTPException, status
-from fastapi.security import HTTPBearer, HTTPAuthCredentials
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy.orm import Session
 from .db import get_db
 from .models import User
 
 # Configuration from environment variables
-SECRET_KEY = os.getenv("SECRET_KEY", "your-secret-key-change-in-production")
+SECRET_KEY = os.getenv("SECRET_KEY")
+if not SECRET_KEY:
+    raise ValueError(
+        "SECRET_KEY environment variable is not set. "
+        "Generate one with: python -c \"import secrets; print(secrets.token_urlsafe(32))\""
+    )
+
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "30"))
 
@@ -44,14 +50,14 @@ def create_access_token(user_id: int, company_id: int, expires_delta: Optional[t
         "iat": datetime.now(timezone.utc),
     }
     
-    encoded_jwt = jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
+    encoded_jwt = encode(payload, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
 
 
 def verify_token(token: str) -> dict:
     """Verify and decode a JWT token."""
     try:
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        payload = decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         user_id: str = payload.get("sub")
         company_id: int = payload.get("company_id")
         
@@ -61,12 +67,12 @@ def verify_token(token: str) -> dict:
                 detail="Invalid token",
             )
         return {"user_id": int(user_id), "company_id": company_id}
-    except jwt.ExpiredSignatureError:
+    except ExpiredSignatureError:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Token has expired",
         )
-    except jwt.JWTError:
+    except JWTError:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid token",
@@ -74,7 +80,7 @@ def verify_token(token: str) -> dict:
 
 
 async def get_current_user(
-    credentials: HTTPAuthCredentials = Depends(security),
+    credentials: HTTPAuthorizationCredentials = Depends(security),
     db: Session = Depends(get_db),
 ) -> User:
     """Get the current authenticated user from the JWT token."""
